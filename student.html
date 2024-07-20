@@ -11,8 +11,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #000;
-            color: #fff;
+            background-color: #f4f4f4;
         }
         .container {
             max-width: 1200px;
@@ -46,39 +45,13 @@
         .tab-content {
             display: none;
             background-color: #fff;
-            color: #000;
             padding: 20px;
-            border-radius: 0;
+            border-radius: 5px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-top: 20px;
         }
         .tab-content.active {
             display: block;
-        }
-        h2 {
-            color: #000;
-        }
-        #calendar {
-            height: 600px;
-        }
-        .event-details {
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 0;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
         }
     </style>
 </head>
@@ -90,7 +63,7 @@
         <ul>
             <li><a href="#" onclick="showTab('news-tab')">News</a></li>
             <li><a href="#" onclick="showTab('exam-rules-tab')">Exam Rules</a></li>
-            <li><a href="#" onclick="showTab('resources-tab')">Resources</a></li>
+            <li><a href="#" onclick="showTab('resource-tab')">Resources</a></li>
             <li><a href="#" onclick="showTab('calendar-tab')">Calendar</a></li>
         </ul>
     </nav>
@@ -461,12 +434,12 @@
                 </tbody>
             </table>
         </div>
-        <div id="resources-tab" class="tab-content">
+        <div id="resource-tab" class="tab-content">
             <h2>Resources</h2>
-            <ul id="resource-list"></ul>
+            <div id="resource-list"></div>
         </div>
         <div id="calendar-tab" class="tab-content">
-            <h2>Exam Calendar</h2>
+            <h2>Calendar</h2>
             <div id="calendar"></div>
         </div>
     </div>
@@ -474,54 +447,72 @@
     <script>
         function showTab(tabId) {
             const tabs = document.querySelectorAll('.tab-content');
-            tabs.forEach(tab => tab.style.display = 'none');
-            document.getElementById(tabId).style.display = 'block';
+            tabs.forEach(tab => tab.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
             if (tabId === 'calendar-tab') {
                 calendar.render();
             }
         }
 
-        // Load blogs
-        const blogList = document.getElementById('news-list');
-        let blogs = JSON.parse(localStorage.getItem('blogs')) || [];
-
-        function displayBlogs() {
-            blogList.innerHTML = '';
+        // Display news
+        const newsList = document.getElementById('news-list');
+        const blogs = JSON.parse(localStorage.getItem('blogs')) || [];
+        function displayNews() {
+            newsList.innerHTML = '';
             blogs.forEach(blog => {
                 const blogDiv = document.createElement('div');
                 blogDiv.innerHTML = `
                     <h3>${blog.title}</h3>
                     <p>${blog.content}</p>
                 `;
-                blogList.appendChild(blogDiv);
+                newsList.appendChild(blogDiv);
             });
         }
 
-        displayBlogs();
+        displayNews();
 
-        // Load resources
+        // Display resources
         const resourceList = document.getElementById('resource-list');
-        let resources = JSON.parse(localStorage.getItem('resources')) || [];
-
+        const resources = JSON.parse(localStorage.getItem('resources')) || [];
         function displayResources() {
             resourceList.innerHTML = '';
-            resources.forEach(resource => {
-                const resourceItem = document.createElement('li');
-                resourceItem.innerHTML = `<a href="${resource.content}" target="_blank">${resource.name}</a>`;
-                resourceList.appendChild(resourceItem);
+            resources.forEach((resource, index) => {
+                const resourceDiv = document.createElement('div');
+                resourceDiv.innerHTML = `
+                    <h3>${resource.name}</h3>
+                    <button onclick="downloadResource(${index})">Download</button>
+                `;
+                resourceList.appendChild(resourceDiv);
             });
+        }
+
+        function downloadResource(index) {
+            const resource = resources[index];
+            const a = document.createElement('a');
+            a.href = resource.content;
+            a.download = resource.name;
+            a.click();
         }
 
         displayResources();
 
-        // Calendar management
+        // Display calendar
         const calendarEl = document.getElementById('calendar');
+        const calendarEvents = JSON.parse(localStorage.getItem('calendarEvents')) || [];
+
         const calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
-            events: JSON.parse(localStorage.getItem('exams')) || []
+            events: calendarEvents,
+            eventClick: function(info) {
+                alert('Event: ' + info.event.title + '\n' +
+                      'Date: ' + info.event.start.toLocaleDateString() + '\n' +
+                      'Details: ' + info.event.extendedProps.details);
+            }
         });
 
-        showTab('news-tab');
+        document.addEventListener('DOMContentLoaded', function() {
+            showTab('news-tab');
+        });
     </script>
 </body>
 </html>
