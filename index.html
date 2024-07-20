@@ -72,21 +72,25 @@
         const pb = new PocketBase('http://127.0.0.1:8090');
         
         async function login() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            
-            try {
-                const authData = await pb.collection('users').authWithPassword(username, password);
-                if (authData.record.role?.name === 'admin') {
-                    window.location.href = 'admin.html';
-                } else {
-                    window.location.href = 'student.html';
-                }
-            } catch (error) {
-                alert('Login failed!');
-                console.error(error);
-            }
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    
+    try {
+        const authData = await pb.collection('users').authWithPassword(username, password);
+        console.log('Auth successful:', authData);
+        if (authData.record.role === 'admin') {
+            window.location.href = 'admin.html';
+        } else {
+            window.location.href = 'student.html';
         }
+    } catch (error) {
+        console.error('Login error:', error);
+        if (error.data) {
+            console.error('Error details:', error.data);
+        }
+        alert('Login failed: ' + (error.message || 'Unknown error'));
+    }
+}
     </script>
 </body>
 </html>
