@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
+    <title>Admin Portal</title>
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.css' rel='stylesheet' />
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.js'></script>
     <style>
@@ -11,8 +11,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #000;
-            color: #fff;
+            background-color: #f4f4f4;
         }
         .container {
             max-width: 1200px;
@@ -46,90 +45,87 @@
         .tab-content {
             display: none;
             background-color: #fff;
-            color: #000;
             padding: 20px;
-            border-radius: 0;
+            border-radius: 5px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-top: 20px;
         }
         .tab-content.active {
             display: block;
         }
-        h2 {
-            color: #000;
-        }
         form {
             margin-bottom: 20px;
         }
-        input[type="text"], input[type="file"], textarea, select {
+        form input, form textarea, form button {
+            display: block;
             width: 100%;
-            padding: 10px;
-            margin: 5px 0;
-            border: 1px solid #ddd;
-            border-radius: 0;
+            margin-bottom: 10px;
         }
-        button {
+        form input, form textarea {
+            padding: 10px;
+            font-size: 16px;
+        }
+        form button {
+            padding: 10px;
+            font-size: 18px;
             background-color: #333;
             color: white;
-            padding: 10px 15px;
             border: none;
-            border-radius: 0;
             cursor: pointer;
-            transition: transform 0.3s;
         }
-        button:hover {
-            transform: scale(1.1);
+        table {
+            width: 100%;
+            border-collapse: collapse;
         }
-        #calendar {
-            height: 600px;
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>Admin Panel</h1>
+        <h1>Admin Portal</h1>
     </header>
     <nav>
         <ul>
-            <li><a href="#" onclick="showTab('blog-tab')">Manage Blog</a></li>
-            <li><a href="#" onclick="showTab('resources-tab')">Manage Resources</a></li>
-            <li><a href="#" onclick="showTab('calendar-tab')">Manage Calendar</a></li>
+            <li><a href="#" onclick="showTab('blog-tab')">Blog Management</a></li>
+            <li><a href="#" onclick="showTab('resource-tab')">Resource Management</a></li>
+            <li><a href="#" onclick="showTab('calendar-tab')">Calendar Management</a></li>
         </ul>
     </nav>
     <div class="container">
         <div id="blog-tab" class="tab-content">
-            <h2>Manage Blog Posts</h2>
+            <h2>Blog Management</h2>
             <form id="blog-form">
                 <input type="text" id="blog-title" placeholder="Blog Title" required>
-                <textarea id="blog-content" placeholder="Blog Content" required></textarea>
-                <button type="submit">Add Blog Post</button>
+                <textarea id="blog-content" placeholder="Blog Content" rows="5" required></textarea>
+                <button type="submit">Add Blog</button>
             </form>
             <div id="blog-list"></div>
         </div>
-        <div id="resources-tab" class="tab-content">
-            <h2>Manage Resources</h2>
+        <div id="resource-tab" class="tab-content">
+            <h2>Resource Management</h2>
             <form id="resource-form">
                 <input type="text" id="resource-name" placeholder="Resource Name" required>
                 <input type="file" id="resource-file" required>
-                <button type="submit">Add Resource</button>
+                <button type="submit">Upload Resource</button>
             </form>
             <div id="resource-list"></div>
         </div>
         <div id="calendar-tab" class="tab-content">
-            <h2>Manage Exam Calendar</h2>
+            <h2>Calendar Management</h2>
             <form id="exam-form">
                 <input type="date" id="exam-date" required>
                 <input type="text" id="exam-title" placeholder="Exam Title" required>
-                <select id="exam-batch">
-                    <option value="all">All Batches</option>
-                    <option value="batch1">Batch 1</option>
-                    <option value="batch2">Batch 2</option>
-                    <option value="batch3">Batch 3</option>
-                </select>
-                <textarea id="exam-details" placeholder="Additional Details"></textarea>
+                <input type="text" id="exam-batch" placeholder="Batch" required>
+                <textarea id="exam-details" placeholder="Details" rows="3" required></textarea>
                 <button type="submit">Add Exam</button>
             </form>
-            <input type="file" id="calendar-file" accept=".json">
-            <button onclick="uploadCalendar()">Upload Calendar</button>
             <div id="calendar"></div>
         </div>
     </div>
@@ -137,8 +133,8 @@
     <script>
         function showTab(tabId) {
             const tabs = document.querySelectorAll('.tab-content');
-            tabs.forEach(tab => tab.style.display = 'none');
-            document.getElementById(tabId).style.display = 'block';
+            tabs.forEach(tab => tab.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
             if (tabId === 'calendar-tab') {
                 calendar.render();
             }
@@ -155,8 +151,7 @@
                 const blogDiv = document.createElement('div');
                 blogDiv.innerHTML = `
                     <h3>${blog.title}</h3>
-                    <p>${blog.content.substring(0, 100)}...</p>
-                    <button onclick="editBlog(${index})">Edit</button>
+                    <p>${blog.content}</p>
                     <button onclick="deleteBlog(${index})">Delete</button>
                 `;
                 blogList.appendChild(blogDiv);
@@ -172,15 +167,6 @@
             displayBlogs();
             blogForm.reset();
         });
-
-        function editBlog(index) {
-            const blog = blogs[index];
-            document.getElementById('blog-title').value = blog.title;
-            document.getElementById('blog-content').value = blog.content;
-            blogs.splice(index, 1);
-            localStorage.setItem('blogs', JSON.stringify(blogs));
-            displayBlogs();
-        }
 
         function deleteBlog(index) {
             blogs.splice(index, 1);
@@ -201,7 +187,7 @@
                 const resourceDiv = document.createElement('div');
                 resourceDiv.innerHTML = `
                     <h3>${resource.name}</h3>
-                    <a href="${resource.content}" target="_blank">View</a>
+                    <button onclick="downloadResource(${index})">Download</button>
                     <button onclick="deleteResource(${index})">Delete</button>
                 `;
                 resourceList.appendChild(resourceDiv);
@@ -222,6 +208,14 @@
             resourceForm.reset();
         });
 
+        function downloadResource(index) {
+            const resource = resources[index];
+            const a = document.createElement('a');
+            a.href = resource.content;
+            a.download = resource.name;
+            a.click();
+        }
+
         function deleteResource(index) {
             resources.splice(index, 1);
             localStorage.setItem('resources', JSON.stringify(resources));
@@ -231,38 +225,59 @@
         displayResources();
 
         // Calendar management
+        const examForm = document.getElementById('exam-form');
+        let calendarEvents = JSON.parse(localStorage.getItem('calendarEvents')) || [];
+
         const calendarEl = document.getElementById('calendar');
         const calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
-            events: JSON.parse(localStorage.getItem('exams')) || []
+            events: calendarEvents,
+            eventClick: function(info) {
+                alert('Event: ' + info.event.title + '\n' +
+                      'Date: ' + info.event.start.toLocaleDateString() + '\n' +
+                      'Details: ' + info.event.extendedProps.details);
+            }
         });
 
-        const examForm = document.getElementById('exam-form');
         examForm.addEventListener('submit', function(e) {
             e.preventDefault();
             const date = document.getElementById('exam-date').value;
             const title = document.getElementById('exam-title').value;
             const batch = document.getElementById('exam-batch').value;
             const details = document.getElementById('exam-details').value;
-            const event = { title, start: date, extendedProps: { batch, details } };
-            calendar.addEvent(event);
-            const exams = calendar.getEvents().map(event => event.toPlainObject());
-            localStorage.setItem('exams', JSON.stringify(exams));
+
+            const newEvent = {
+                title: `${title} (${batch})`,
+                start: date,
+                extendedProps: {
+                    details: details
+                }
+            };
+
+            calendarEvents.push(newEvent);
+            calendar.addEvent(newEvent);
+            localStorage.setItem('calendarEvents', JSON.stringify(calendarEvents));
             examForm.reset();
         });
 
         function uploadCalendar() {
-            const file = document.getElementById('calendar-file').files[0];
+            const fileInput = document.getElementById('calendar-file');
+            const file = fileInput.files[0];
             const reader = new FileReader();
             reader.onload = function(e) {
-                const events = JSON.parse(e.target.result);
-                events.forEach(event => calendar.addEvent(event));
-                localStorage.setItem('exams', JSON.stringify(calendar.getEvents().map(event => event.toPlainObject())));
+                calendarEvents = JSON.parse(e.target.result);
+                calendar.removeAllEvents();
+                calendarEvents.forEach(event => {
+                    calendar.addEvent(event);
+                });
+                localStorage.setItem('calendarEvents', JSON.stringify(calendarEvents));
             };
             reader.readAsText(file);
         }
 
-        showTab('blog-tab');
+        document.addEventListener('DOMContentLoaded', function() {
+            showTab('blog-tab');
+        });
     </script>
 </body>
 </html>
