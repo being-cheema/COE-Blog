@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.css' rel='stylesheet' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.js'></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: #fff;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+        nav {
+            background-color: #444;
+            padding: 10px 0;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            text-align: center;
+        }
+        nav ul li {
+            display: inline;
+            margin: 0 10px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+        }
+        .tab-content {
+            display: none;
+            background-color: #fff;
+            color: #000;
+            padding: 20px;
+            border-radius: 0;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .tab-content.active {
+            display: block;
+        }
+        h2 {
+            color: #000;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="file"], textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 0;
+        }
+        button {
+            background-color: #333;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 0;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        button:hover {
+            transform: scale(1.1);
+        }
+        #calendar {
+            height: 600px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Admin Panel</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="#" onclick="showTab('blog-tab')">Manage Blog</a></li>
+            <li><a href="#" onclick="showTab('resources-tab')">Manage Resources</a></li>
+            <li><a href="#" onclick="showTab('calendar-tab')">Manage Calendar</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <div id="blog-tab" class="tab-content">
+            <h2>Manage Blog Posts</h2>
+            <form id="blog-form">
+                <input type="text" id="blog-title" placeholder="Blog Title" required>
+                <textarea id="blog-content" placeholder="Blog Content" required></textarea>
+                <button type="submit">Add Blog Post</button>
+            </form>
+            <div id="blog-list"></div>
+        </div>
+        <div id="resources-tab" class="tab-content">
+            <h2>Manage Resources</h2>
+            <form id="resource-form">
+                <input type="text" id="resource-name" placeholder="Resource Name" required>
+                <input type="file" id="resource-file" required>
+                <button type="submit">Add Resource</button>
+            </form>
+            <div id="resource-list"></div>
+        </div>
+        <div id="calendar-tab" class="tab-content">
+            <h2>Manage Exam Calendar</h2>
+            <form id="exam-form">
+                <input type="date" id="exam-date" required>
+                <input type="text" id="exam-title" placeholder="Exam Title" required>
+                <select id="exam-batch">
+                    <option value="all">All Batches</option>
+                    <option value="batch1">Batch 1</option>
+                    <option value="batch2">Batch 2</option>
+                    <option value="batch3">Batch 3</option>
+                </select>
+                <textarea id="exam-details" placeholder="Additional Details"></textarea>
+                <button type="submit">Add Exam</button>
+            </form>
+            <input type="file" id="calendar-file" accept=".json">
+            <button onclick="uploadCalendar()">Upload Calendar</button>
+            <div id="calendar"></div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabId) {
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.style.display = 'none');
+            document.getElementById(tabId).style.display = 'block';
+            if (tabId === 'calendar-tab') {
+                calendar.render();
+            }
+        }
+
+        // Blog management
+        const blogForm = document.getElementById('blog-form');
+        const blogList = document.getElementById('blog-list');
+        let blogs = JSON.parse(localStorage.getItem('blogs')) || [];
+
+        function displayBlogs() {
+            blogList.innerHTML = '';
+            blogs.forEach((blog, index) => {
+                const blogDiv = document.createElement('div');
+                blogDiv.innerHTML = `
+                    <h3>${blog.title}</h3>
+                    <p>${blog.content.substring(0, 100)}...</p>
+                    <button onclick="editBlog(${index})">Edit</button>
+                    <button onclick="deleteBlog(${index})">Delete</button>
+                `;
+                blogList.appendChild(blogDiv);
+            });
+        }
+
+        blogForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const title = document.getElementById('blog-title').value;
+            const content = document.getElementById('blog-content').value;
+            blogs.push({ title, content });
+            localStorage.setItem('blogs', JSON.stringify(blogs));
+            displayBlogs();
+            blogForm.reset();
+        });
+
+        function editBlog(index) {
+            const blog = blogs[index];
+            document.getElementById('blog-title').value = blog.title;
+            document.getElementById('blog-content').value = blog.content;
+            blogs.splice(index, 1);
+            localStorage.setItem('blogs', JSON.stringify(blogs));
+            displayBlogs();
+        }
+
+        function deleteBlog(index) {
+            blogs.splice(index, 1);
+            localStorage.setItem('blogs', JSON.stringify(blogs));
+            displayBlogs();
+        }
+
+        displayBlogs();
+
+        // Resource management
+        const resourceForm = document.getElementById('resource-form');
+        const resourceList = document.getElementById('resource-list');
+        let resources = JSON.parse(localStorage.getItem('resources')) || [];
+
+        function displayResources() {
+            resourceList.innerHTML = '';
+            resources.forEach((resource, index) => {
+                const resourceDiv = document.createElement('div');
+                resourceDiv.innerHTML = `
+                    <h3>${resource.name}</h3>
+                    <a href="${resource.content}" target="_blank">View</a>
+                    <button onclick="deleteResource(${index})">Delete</button>
+                `;
+                resourceList.appendChild(resourceDiv);
+            });
+        }
+
+        resourceForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('resource-name').value;
+            const file = document.getElementById('resource-file').files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                resources.push({ name, content: e.target.result });
+                localStorage.setItem('resources', JSON.stringify(resources));
+                displayResources();
+            };
+            reader.readAsDataURL(file);
+            resourceForm.reset();
+        });
+
+        function deleteResource(index) {
+            resources.splice(index, 1);
+            localStorage.setItem('resources', JSON.stringify(resources));
+            displayResources();
+        }
+
+        displayResources();
+
+        // Calendar management
+        const calendarEl = document.getElementById('calendar');
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            events: JSON.parse(localStorage.getItem('exams')) || []
+        });
+
+        const examForm = document.getElementById('exam-form');
+        examForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const date = document.getElementById('exam-date').value;
+            const title = document.getElementById('exam-title').value;
+            const batch = document.getElementById('exam-batch').value;
+            const details = document.getElementById('exam-details').value;
+            const event = { title, start: date, extendedProps: { batch, details } };
+            calendar.addEvent(event);
+            const exams = calendar.getEvents().map(event => event.toPlainObject());
+            localStorage.setItem('exams', JSON.stringify(exams));
+            examForm.reset();
+        });
+
+        function uploadCalendar() {
+            const file = document.getElementById('calendar-file').files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const events = JSON.parse(e.target.result);
+                events.forEach(event => calendar.addEvent(event));
+                localStorage.setItem('exams', JSON.stringify(calendar.getEvents().map(event => event.toPlainObject())));
+            };
+            reader.readAsText(file);
+        }
+
+        showTab('blog-tab');
+    </script>
+</body>
+</html>

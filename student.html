@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Portal</title>
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.css' rel='stylesheet' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.js'></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: #fff;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+        nav {
+            background-color: #444;
+            padding: 10px 0;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            text-align: center;
+        }
+        nav ul li {
+            display: inline;
+            margin: 0 10px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+        }
+        .tab-content {
+            display: none;
+            background-color: #fff;
+            color: #000;
+            padding: 20px;
+            border-radius: 0;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .tab-content.active {
+            display: block;
+        }
+        h2 {
+            color: #000;
+        }
+        #calendar {
+            height: 600px;
+        }
+        .event-details {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Student Portal</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="#" onclick="showTab('news-tab')">News</a></li>
+            <li><a href="#" onclick="showTab('exam-rules-tab')">Exam Rules</a></li>
+            <li><a href="#" onclick="showTab('resources-tab')">Resources</a></li>
+            <li><a href="#" onclick="showTab('calendar-tab')">Calendar</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <div id="news-tab" class="tab-content">
+            <h2>News</h2>
+            <div id="news-list"></div>
+        </div>
+        <div id="exam-rules-tab" class="tab-content">
+            <h2>Exam Rules</h2>
+            <h3>Instructions to Students</h3>
+            <ol>
+                <li>Students are requested to note their Hall, Row and Seat Number for each examination, which may vary from day to day. Seating arrangements will be displayed in the Office of the Controller of Examinations and in the Exam Hall.</li>
+                <li>Students shall wear their valid ID Card for every examination for verifying their identity in the examination hall. Students without ID Card will not be permitted to write the examination.</li>
+                <li>Students shall occupy their seats at least ten minutes prior to the commencement of the examination and they are not allowed to move around their seats under any pretext during examination hours.</li>
+                <li>Normally students will not be permitted to enter the examination hall after the commencement of the examination. Only on extraordinary circumstances, the students may be permitted during the first thirty minutes of the examination after obtaining the permission from the CoE. No student desirous of writing the examination shall be permitted to enter the hall after the expiry of first thirty minutes. Similarly, no student shall be permitted to leave the hall earlier than forty-five minutes from the commencement of examination.</li>
+                <li>Students will NOT be allowed to leave the Exam Hall once examination commences until the submission of their answer scripts unless there are excruciating circumstances requiring an exception.</li>
+                <li>Before commencement of examination, the student must ensure that no forbidden materials / writings are present in his / her vicinity. If any such things are found by the student, it should be brought to the notice of Hall Superintendent before the commencement of the examination. The student cannot plead innocence and must bear the punishment if such materials / writings are found by the Hall Superintendent while writing the examination.</li>
+                <li>Students are not allowed to write beyond the time limit prescribed for the course concerned.</li>
+                <li>Students shall bring their own pens, pencils, erasers, and other permitted materials and will not be allowed to borrow anything from others in the examination hall. Students should use only blue or black ink / ball pen while answering the questions. Colour pens / sketch pens are allowed only for drawing diagrams / charts.</li>
+                <li>A student is permitted to use geometric tools, non-programmable calculators and approved tables and data books only, during the examinations. No other material / gadget (including tabs / mobile phone / smart watches) should be brought inside the examination hall.</li>
+                <li>The student must verify the receipt of proper question paper by cross checking the course code and course title printed in the question paper before starting to answer. Question papers which are not relevant should be returned to Hall Superintendent immediately.</li>
+                <li>Students are forbidden from asking any query relating to meaning or correction or typographical error in the question paper during the examination. Students should not move from his / her place for any purpose during the examination.</li>
+                <li>Rough work if any must be done only on the space allotted at the end (last but one page) of the answer-book. No separate answer-book for rough work will be supplied to the students.</li>
+                <li>A student should neither possess / refer any forbidden material in any form nor seek / obtain assistance in any form from any person / source towards answering the questions during the examinations. He / she should not assist other students in any form towards answering the questions during the examinations. The student should not indulge in canvassing either directly or indirectly to award more than deserving marks in the examinations. The student should maintain discipline and decorum during the examinations.</li>
+                <li>Writing any irrelevant matter or making an appeal to the examiner in the answer-book will be treated as a case of malpractice.</li>
+                <li>Writing a wrong Registration Number will lead to rejection of answer-script and the student is liable for further punishment.</li>
+                <li>Students should not detach any sheet from the main answer-book or take away any sheet / material from the examination hall. He / she should not leave any irrelevant material / sheet inside the answer-book while handing it over to Hall Superintendent.</li>
+                <li>When the permitted materials like data book / calculator brought inside the examination hall, contain any forbidden writings / materials the student cannot plead innocence by claiming that the material / instrument is a borrowed one.</li>
+                <li>Violation of the examination rule in any form during the examinations will attract punishment ranging from levying fine to permanently debarring the student from continuing his / her studies.</li>
+                <li>The students should read the malpractice punishment rules containing nature of violation in the examinations and the punishment recommended.</li>
+                <li>Any personal message to the student, shall not, in any case be delivered to the student until he / she completes the examination.</li>
+                <li>Students who are suffering from infectious diseases of any kind will not be allowed to write the examination.</li>
+            </ol>
+
+            <h3>Guidelines for Awarding Punishments to Malpractice Cases of Candidates</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sl. No</th>
+                        <th>Nature of Malpractice</th>
+                        <th>Punishment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Appeal by the candidate in the answer script to show mercy by way of awarding more than deserving marks.</td>
+                        <td>Fine of Rs. 1000/- per subject</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>The candidate writing his / her name in the answer script.</td>
+                        <td>Fine of Rs. 1000/- per subject</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>The Candidate writing his / her registration number in places other than specified in the answer script.</td>
+                        <td>Fine of Rs. 1000/- per subject</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Any special marking in the answer script by the candidate.</td>
+                        <td>Fine of Rs. 1000/- per subject</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>The candidate communicating with neighbouring candidate orally or non-verbally; the candidate causing suspicious movement of his / her body.</td>
+                        <td>Fine of Rs. 1000/- per subject</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>Irrelevant writing by the candidate in the answer script.</td>
+                        <td>Fine of Rs. 1000/- per subject</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>The candidate writing answer on his/her question paper or making use of his/her question paper for rough work.</td>
+                        <td>Fine of Rs. 1000/- per subject</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td>The candidate possessing cell phones / programmable calculator(s) / any other electronic storage device(s), gadgets.</td>
+                        <td>Invalidating the examination of the particular subject written by the candidate.</td>
+                    </tr>
+                    <tr>
+                        <td>9</td>
+                        <td>The Candidate facilitating the other candidate(s) to copy from his / her answer script.</td>
+                        <td>Invalidating the examination of the particular
+                            subject written by the candidate.</td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>The candidate possessing any incriminating material(s) (whether used or not).
+                            For example: - Written or printed materials, bits of papers containing written information, writings on scale, calculator,
+                            handkerchief, dress, part of the body, Hall Ticket, etc.</td>
+                        <td>Invalidating the examination of the subject
+                            concerned and the theory and practical subjects of
+                            the current semester registered by the candidate.
+                            
+                            Further the candidate is not considered for
+                            revaluation of answer scripts of the arrear subjects.
+                            
+                            If the candidate has registered for the arrear
+                            subjects only, invalidating the examinations of all
+                            the arrear- subjects registered by the candidate.</td>
+                    </tr>
+                    <tr>
+                        <td>11</td>
+                        <td>The candidate possessing cell phone(s) / programmable calculator(s) / any other electronic storage device(s), gadgets and containing
+                            incriminating materials (whether used or not).</td>
+                        <td>Invalidating the examination of the subject
+                            concerned and the theory and practical subjects of
+                            the current semester registered by the candidate.
+                            
+                            Further the candidate is not considered for
+                            revaluation of answer scripts of the arrear subjects.
+                            
+                            If the candidate has registered for the arrear
+                            subjects only, invalidating the examinations of all
+                            the arrear- subjects registered by the candidate.</td>
+                    </tr>
+                    <tr>
+                        <td>12</td>
+                        <td>The candidate possessing the question paper of another candidate with additional writing on it.</td>
+                        <td>Invalidating the examination of the subject
+                            concerned and the theory and practical subjects of
+                            the current semester registered by the candidate.
+                            
+                            Further the candidate is not considered for
+                            revaluation of answer scripts of the arrear subjects.
+                            
+                            If the candidate has registered for the arrear
+                            subjects only, invalidating the examinations of all
+                            the arrear- subjects registered by the candidate.</td>
+                    </tr>
+                    <tr>
+                        <td>13</td>
+                        <td>The candidate passing his/her question paper to another candidate with additional writing on it.</td>
+                        <td>Invalidating the examination of the subject
+                            concerned and the theory and practical subjects of
+                            the current semester registered by the candidate.
+                            
+                            Further the candidate is not considered for
+                            revaluation of answer scripts of the arrear subjects.
+                            
+                            If the candidate has registered for the arrear
+                            subjects only, invalidating the examinations of all
+                            the arrear- subjects registered by the candidate.</td>
+                    </tr>
+                    <tr>
+                        <td>14</td>
+                        <td>The candidate passing incriminating materials brought into the examination hall in any medium (hard/soft) to other candidate(s).</td>
+                        <td>Invalidating the examination of the subject
+                            concerned and the theory and practical subjects of
+                            the current semester registered by the candidate.
+                            
+                            Further the candidate is not considered for
+                            revaluation of answer scripts of the arrear subjects.
+                            
+                            If the candidate has registered for the arrear
+                            subjects only, invalidating the examinations of all
+                            the arrear- subjects registered by the candidate.</td>
+                    </tr>
+                    <tr>
+                        <td>15</td>
+                        <td>The candidate copying from neighbouring candidate.</td>
+                        <td>Invalidating the examination of the subject
+                            concerned and the theory and practical subjects of
+                            the current semester registered by the candidate.
+                            
+                            Further the candidate is not considered for
+                            revaluation of answer scripts of the arrear subjects.
+                            
+                            If the candidate has registered for the arrear
+                            subjects only, invalidating the examinations of all
+                            the arrear- subjects registered by the candidate.</td>
+                    </tr>
+                    <tr>
+                        <td>16</td>
+                        <td>The candidate taking out of the examination hall answer booklet(s), used or unused.</td>
+                        <td>Invalidating the examination of the subject
+                            concerned and the theory and practical subjects of
+                            the current semester registered by the candidate.
+                            
+                            Further the candidate is not considered for
+                            revaluation of answer scripts of the arrear subjects.
+                            
+                            If the candidate has registered for the arrear
+                            subjects only, invalidating the examinations of all
+                            the arrear- subjects registered by the candidate.</td>
+                    </tr>
+                    <tr>
+                        <td>17</td>
+                        <td>Appeal by the candidate in the answer script coupled with a promise of any form of consideration.</td>
+                        <td>Invalidating the examination of the subject
+                            concerned and the theory and practical subjects of
+                            the current semester registered by the candidate.
+                            
+                            Further the candidate is not considered for
+                            revaluation of answer scripts of the arrear subjects.
+                            
+                            If the candidate has registered for the arrear
+                            subjects only, invalidating the examinations of all
+                            the arrear- subjects registered by the candidate.</td>
+                    </tr>
+                    <tr>
+                        <td>18</td>
+                        <td>The candidate destroying evidence relating to an alleged irregularity. </td>
+                        <td>Invalidating the examination of the subject concerned
+                            and the theory and practical subjects of the current
+                            semester registered by the candidate.
+                            Further the candidate is not considered for revaluation of
+                            answer scripts of the arrear subjects.
+                            If the candidate has registered for the arrear subjects
+                            only, invalidating the examinations of all the arrear-
+                            subjects registered by the candidate.
+                            (i) If the candidate has not completed the programme,
+                            he/she is debarred from continuing his/her studies for
+                            one year i.e., for two subsequent semesters. However,
+                            the student is permitted to appear for the examination in
+                            all the arrear subjects during the debarred period.
+                            (ii) If the candidate has completed the programme,
+                            he/she is prevented from writing the examinations of the
+                            arrear subjects for two subsequent semesters.</td>
+                    </tr>
+                    <tr>
+                        <td>19</td>
+                        <td>Vulgar / offensive writings by the candidate in the answer script.</td>
+                        <td>Invalidating the examinations of all the theory and
+                            practical subjects of the current semester and all the
+                            arrear subjects registered by the candidate.</td>
+                    </tr>
+                    <tr>
+                        <td>20</td>
+                        <td>The candidate possessing the answer script of another candidate.</td>
+                        <td>Invalidating the examinations of all the theory and
+                            practical subjects of the current semester and all the
+                            arrear subjects registered by the candidate.</td>
+                    </tr>
+                    
+                    <tr>
+                        <td>21</td>
+                        <td>The candidate passing his/her answer scripts to another candidate.</td>
+                        <td>Invalidating the examinations of all the theory and
+                            practical subjects of the current semester and all the
+                            arrear subjects registered by the candidate.</td>
+                    </tr>
+                    <tr>
+                        <td>22</td>
+                        <td>The candidate substituting an answer booklet prepared outside the examination hall for the one already distributed to the
+                            candidate.</td>
+                        <td>Invalidating the examinations of all the theory and
+                            practical subjects of the current semester and all the
+                            arrear subjects registered by the candidate.
+                            Additional Punishment:
+                            (i) If the candidate has not completed the programme,
+                            he/she is debarred from continuing his/her studies for
+                            one year i.e. for two subsequent semesters. However,
+                            the student is permitted to appear for the examination in
+                            all the arrear subjects during the debarred period.
+                            (ii) If the candidate has completed the programme,
+                            he/she is prevented from writing the examinations of the
+                            arrear subjects for the two subsequent semesters.</td>
+                    </tr>
+                    <tr>
+                        <td>23</td>
+                        <td>Involved in any one or more of the malpractices of serial no. 8 to 21 for the second or subsequent times.</td>
+                        <td>Invalidating the examinations of all the theory and
+                            practical subjects of the current semester and all the
+                            arrear subjects registered by the candidate.
+                            Additional Punishment:
+                            (i) If the candidate has not completed the programme,
+                            he/she is debarred from continuing his/her studies for
+                            one year i.e. for two subsequent semesters. However,
+                            the student is permitted to appear for the examination in
+                            all the arrear subjects during the debarred period.
+                            (ii) If the candidate has completed the programme,
+                            he/she is prevented from writing the examinations of the
+                            arrear subjects for the two subsequent semesters.</td>
+                    </tr>
+                    <tr>
+                        <td>24</td>
+                        <td>The candidate misbehaving in the examination hall.</td>
+                        <td>Invalidating the examinations of all the theory and
+                            practical subjects of the current semester and all the
+                            arrear subjects registered by the candidate.
+                            Additional Punishment:
+                            (i) If the candidate has not completed the programme,
+                            he/she is debarred from continuing his/her studies for
+                            one year i.e. for two subsequent semesters. However,
+                            the student is permitted to appear for the examination in
+                            all the arrear subjects during the debarred period.
+                            (ii) If the candidate has completed the programme,
+                            he/she is prevented from writing the examinations of the
+                            arrear subjects for the two subsequent semesters.</td>
+                    </tr>
+                    <tr>
+                        <td>25</td>
+                        <td>The candidate indulges in any disruptive conduct including, but not limited to, shouting, assault of superintendent, officials or
+                            students using abusive and/or threatening language, destruction of property.</td>
+                        <td>Invalidating the examinations of all the theory and
+                            practical subjects of the current semester and all the
+                            arrear subjects registered by the candidate.
+                            Additional Punishment:
+                            (i) If the candidate has not completed the programme,
+                            he/she is debarred from continuing his/her studies for
+                            one year i.e. for two subsequent semesters. However,
+                            the student is permitted to appear for the examination in
+                            all the arrear subjects during the debarred period.
+                            (ii) If the candidate has completed the programme,
+                            he/she is prevented from writing the examinations of the
+                            arrear subjects for the two subsequent semesters.</td>
+                    </tr>
+                    <tr>
+                        <td>26</td>
+                        <td>The candidate harasses or engage others to harass on his/her behalf, the hall superintendent, official, witnesses or any other
+                            person in relation to an irregularity by making telephone calls, visits mails or by any other means.</td>
+                        <td>Invalidating the examinations of all the theory and
+                            practical subjects of the current semester and all the
+                            arrear subjects registered by the candidate.
+                            Additional Punishment:
+                            (i) If the candidate has not completed the programme,
+                            he/she is debarred from continuing his/her studies for
+                            one year i.e. for two subsequent semesters. However,
+                            the student is permitted to appear for the examination in
+                            all the arrear subjects during the debarred period.
+                            (ii) If the candidate has completed the programme,
+                            he/she is prevented from writing the examinations of the
+                            arrear subjects for the two subsequent semesters.</td>
+                    </tr>
+                    <tr>
+                        <td>27</td>
+                        <td>Candidate possessing any firearm / weapon inside the examination hall.</td>
+                        <td>Invalidating the examinations of all the theory and
+                            practical subjects of the current semester and all the
+                            arrear subjects registered by the candidate.
+                            Additional Punishment:
+                            (i) If the candidate has not completed the programme,
+                            he/she is debarred from continuing his/her studies for
+                            one year i.e. for two subsequent semesters. However,
+                            the student is permitted to appear for the examination in
+                            all the arrear subjects during the debarred period.
+                            (ii) If the candidate has completed the programme,
+                            he/she is prevented from writing the examinations of the
+                            arrear subjects for the two subsequent semesters.</td>
+                    </tr>
+                    <tr>
+                        <td>28</td>
+                        <td>Cases of Impersonation. </td>
+                        <td>(i) Handing over the impersonator to the police with a
+                            complaint to take appropriate action against the person
+                            involved in the impersonation by the Chief
+                            Superintendent.
+                            (ii) If a student at this University is found to
+                            impersonate a ‘bonafide student’, the impersonating
+                            student is debarred from continuing his/her studies and
+                            writing examinations permanently. He/she is not eligible
+                            for any further admission to any programme of the
+                            University.
+                            (iii) Debarring the ‘bonafide student’ for whom the
+                            impersonation was done from continuing his/her studies
+                            and writing the examinations permanently. He / She is
+                            not eligible for any further admission to any programme
+                            of the University.</td>
+                    </tr>
+                    
+                </tbody>
+            </table>
+        </div>
+        <div id="resources-tab" class="tab-content">
+            <h2>Resources</h2>
+            <ul id="resource-list"></ul>
+        </div>
+        <div id="calendar-tab" class="tab-content">
+            <h2>Exam Calendar</h2>
+            <div id="calendar"></div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabId) {
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.style.display = 'none');
+            document.getElementById(tabId).style.display = 'block';
+            if (tabId === 'calendar-tab') {
+                calendar.render();
+            }
+        }
+
+        // Load blogs
+        const blogList = document.getElementById('news-list');
+        let blogs = JSON.parse(localStorage.getItem('blogs')) || [];
+
+        function displayBlogs() {
+            blogList.innerHTML = '';
+            blogs.forEach(blog => {
+                const blogDiv = document.createElement('div');
+                blogDiv.innerHTML = `
+                    <h3>${blog.title}</h3>
+                    <p>${blog.content}</p>
+                `;
+                blogList.appendChild(blogDiv);
+            });
+        }
+
+        displayBlogs();
+
+        // Load resources
+        const resourceList = document.getElementById('resource-list');
+        let resources = JSON.parse(localStorage.getItem('resources')) || [];
+
+        function displayResources() {
+            resourceList.innerHTML = '';
+            resources.forEach(resource => {
+                const resourceItem = document.createElement('li');
+                resourceItem.innerHTML = `<a href="${resource.content}" target="_blank">${resource.name}</a>`;
+                resourceList.appendChild(resourceItem);
+            });
+        }
+
+        displayResources();
+
+        // Calendar management
+        const calendarEl = document.getElementById('calendar');
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            events: JSON.parse(localStorage.getItem('exams')) || []
+        });
+
+        showTab('news-tab');
+    </script>
+</body>
+</html>
