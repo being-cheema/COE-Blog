@@ -6,7 +6,6 @@
     <title>Admin Portal</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.css' rel='stylesheet' />
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.js'></script>
     <style>
         body {
             font-family: 'Roboto Mono', monospace;
@@ -147,16 +146,54 @@
     </div>
 
     <script src="https://unpkg.com/pocketbase@0.21.1/dist/pocketbase.umd.js"></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.js'></script>
     <script>
-        const pb = new PocketBase('http://127.0.0.1:8090');
+        const pb = new PocketBase('http://127.0.0.1:8090'); // Adjust URL as needed
 
         async function checkAuth() {
-            if (!pb.authStore.isValid) {
-                window.location.href = 'index.html';
+            try {
+                await pb.authStore.authenticate(); // Check authentication status
+            } catch (error) {
+                console.error('Authentication failed:', error);
+                window.location.href = 'index.html'; // Redirect to login on failure
             }
         }
 
-        checkAuth();
+        async function displayBlogs() {
+            const blogList = document.getElementById('blog-list');
+            const blogs = await pb.collection('blogs').find();
+            blogList.innerHTML = '';
+            blogs.forEach(blog => {
+                const blogElement = document.createElement('div');
+                blogElement.innerHTML = `<h3>${blog.title}</h3><p>${blog.content}</p>`;
+                blogList.appendChild(blogElement);
+            });
+        }
+
+        async function displayResources() {
+            const resourceList = document.getElementById('resource-list');
+            const resources = await pb.collection('resources').find();
+            resourceList.innerHTML = '';
+            resources.forEach(resource => {
+                const resourceElement = document.createElement('div');
+                resourceElement.innerHTML = `<h3>${resource.name}</h3><a href="${resource.file.url}" target="_blank">Download</a>`;
+                resourceList.appendChild(resourceElement);
+            });
+        }
+
+        async function loadCalendarEvents() {
+            const events = await pb.collection('exams').find();
+            return events.map(event => ({
+                title: event.title,
+                start: new Date(event.date),
+                extendedProps: { details: event.details }
+            }));
+        }
+
+        async function logout() {
+            pb.authStore.clear(); // Clear authentication data
+            window.location.href = 'index.html'; // Redirect to login page
+        }
 
         function showTab(tabId) {
             const tabs = document.querySelectorAll('.tab-content');
@@ -167,134 +204,75 @@
             }
         }
 
-        // Blog management
-        const blogForm = document.getElementById('blog-form');
-        const blogList = document.getElementById('blog-list');
-
-        async function displayBlogs() {
-            blogList.innerHTML = '';
-            const blogs = await pb.collection('blogs').getFullList();
-            blogs.forEach((blog) => {
-                const blogDiv = document.createElement('div');
-                blogDiv.innerHTML = `
-                    <h3>${blog.title}</h3>
-                    <p>${blog.content}</p>
-                    <button onclick="deleteBlog('${blog.id}')">Delete</button>
-                `;
-                blogList.appendChild(blogDiv);
-            });
-        }
-
-        blogForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
+        async function addBlog(event) {
+            event.preventDefault();
             const title = document.getElementById('blog-title').value;
             const content = document.getElementById('blog-content').value;
-            await pb.collection('blogs').create({ title, content });
-            await displayBlogs();
-            blogForm.reset();
-        });
-
-        async function deleteBlog(id) {
-            await pb.collection('blogs').delete(id);
-            await displayBlogs();
-        }
-
-        displayBlogs();
-
-        // Resource management
-        const resourceForm = document.getElementById('resource-form');
-        const resourceList = document.getElementById('resource-list');
-
-        async function displayResources() {
-            resourceList.innerHTML = '';
-            const resources = await pb.collection('resources').getFullList();
-            resources.forEach((resource) => {
-                const resourceDiv = document.createElement('div');
-                resourceDiv.innerHTML = `
-                    <h3>${resource.name}</h3>
-                    <button onclick="downloadResource('${resource.id}')">Download</button>
-                    <button onclick="deleteResource('${resource.id}')">Delete</button>
-                `;
-                resourceList.appendChild(resourceDiv);
-            });
-        }
-
-        resourceForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const name = document.getElementById('resource-name').value;
-            const file = document.getElementById('resource-file').files[0];
-            const formData = new FormData();
-            formData.append('name', name);
-            formData.append('content', file);
-            await pb.collection('resources').create(formData);
-            await displayResources();
-            resourceForm.reset();
-        });
-
-        async function downloadResource(id) {
-            const resource = await pb.collection('resources').getOne(id);
-            const fileUrl = pb.getFileUrl(resource, resource.content);
-            window.open(fileUrl, '_blank');
-        }
-
-        async function deleteResource(id) {
-            await pb.collection('resources').delete(id);
-            await displayResources();
-        }
-
-        displayResources();
-
-        // Calendar management
-        const examForm = document.getElementById('exam-form');
-
-        async function loadCalendarEvents() {
-            const events = await pb.collection('calendar_events').getFullList();
-            return events.map(event => ({
-                title: event.title,
-                start: event.start,
-                extendedProps: {
-                    details: event.details
-                }
-            }));
-        }
-
-        const calendarEl = document.getElementById('calendar');
-        const calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            events: loadCalendarEvents,
-            eventClick: function(info) {
-                alert('Event: ' + info.event.title + '\n' +
-                      'Date: ' + info.event.start.toLocaleDateString() + '\n' +
-                      'Details: ' + info.event.extendedProps.details);
+            try {
+                await pb.collection('blogs').create({ title, content });
+                document.getElementById('blog-form').reset();
+                displayBlogs();
+            } catch (error) {
+                console.error('Error adding blog:', error);
+                alert('Failed to add blog. Please try again.');
             }
-        });
+        }
 
-        examForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
+        async function uploadResource(event) {
+            event.preventDefault();
+            const name = document.getElementById('resource-name').value;
+            const fileInput = document.getElementById('resource-file');
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file, file.name);
+            try {
+                const uploadedFile = await pb.files.upload(formData);
+                await pb.collection('resources').create({ name, file: uploadedFile });
+                document.getElementById('resource-form').reset();
+                displayResources();
+            } catch (error) {
+                console.error('Error uploading resource:', error);
+                alert('Failed to upload resource. Please try again.');
+            }
+        }
+
+        async function addExam(event) {
+            event.preventDefault();
             const date = document.getElementById('exam-date').value;
             const title = document.getElementById('exam-title').value;
             const batch = document.getElementById('exam-batch').value;
             const details = document.getElementById('exam-details').value;
-
-            const newEvent = {
-                title: `${title} (${batch})`,
-                start: date,
-                details: details
-            };
-
-            await pb.collection('calendar_events').create(newEvent);
-            calendar.refetchEvents();
-            examForm.reset();
-        });
-
-        function logout() {
-            pb.authStore.clear();
-            window.location.href = 'index.html';
+            try {
+                await pb.collection('exams').create({ date, title, batch, details });
+                document.getElementById('exam-form').reset();
+                calendar.refetchEvents();
+            } catch (error) {
+                console.error('Error adding exam:', error);
+                alert('Failed to add exam. Please try again.');
+            }
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuth(); // Check authentication on page load
             showTab('blog-tab');
+            displayBlogs();
+            displayResources();
+
+            const calendarEl = document.getElementById('calendar');
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                events: await loadCalendarEvents(),
+                eventClick: function(info) {
+                    alert('Event: ' + info.event.title + '\n' +
+                          'Date: ' + info.event.start.toLocaleDateString() + '\n' +
+                          'Details: ' + info.event.extendedProps.details);
+                }
+            });
             calendar.render();
+
+            document.getElementById('blog-form').addEventListener('submit', addBlog);
+            document.getElementById('resource-form').addEventListener('submit', uploadResource);
+            document.getElementById('exam-form').addEventListener('submit', addExam);
         });
     </script>
 </body>
