@@ -3,35 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>SNUC-COE BLOG</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Roboto Mono', monospace;
             background-color: #000;
             color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            height: 100vh;
+            padding: 20px;
+            background-color: #111;
+        }
+        .header h1 {
             margin: 0;
         }
         .login-container {
-            text-align: center;
-        }
-        h1 {
-            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: calc(100vh - 80px);
         }
         input[type="text"], input[type="password"] {
-            width: 200px;
+            width: 300px;
             padding: 10px;
             margin: 10px 0;
-            border: 1px solid #fff;
-            border-radius: 0;
+            border: 2px solid #fff;
             background: #000;
             color: #fff;
+            font-family: 'Roboto Mono', monospace;
         }
         button {
-            width: 220px;
+            width: 320px;
             padding: 10px;
             margin: 10px 0;
             border: 2px solid #fff;
@@ -39,22 +48,26 @@
             color: #fff;
             cursor: pointer;
             transition: all 0.3s;
+            font-family: 'Roboto Mono', monospace;
         }
         button:hover {
-            width: 240px;
+            transform: scale(1.05);
             background: #fff;
             color: #000;
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
+    <div class="header">
         <h1>SNUC-COE BLOG</h1>
+    </div>
+    <div class="login-container">
         <input type="text" id="username" placeholder="Username">
         <input type="password" id="password" placeholder="Password">
         <button onclick="login()">Login</button>
     </div>
-    <script src="https://unpkg.com/pocketbase/dist/pocketbase.umd.js"></script>
+
+    <script src="https://unpkg.com/pocketbase@0.21.1/dist/pocketbase.umd.js"></script>
     <script>
         const pb = new PocketBase('http://127.0.0.1:8090');
         
@@ -64,7 +77,7 @@
             
             try {
                 const authData = await pb.collection('users').authWithPassword(username, password);
-                if (authData.user.role === 'admin') {
+                if (authData.record.role === 'admin') {
                     window.location.href = 'admin.html';
                 } else {
                     window.location.href = 'student.html';
